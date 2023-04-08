@@ -1,173 +1,407 @@
 #include "example.h"
 #include <string.h>
 #include <iostream>
-namespace Fun {
-    // Написати функцію - шаблон послідовного пошуку в максимального серед 4 елементів.
-// Написати специфікацію функції - шаблон для типу char* .
-// Розробити програму тестування шаблона для декількох типів 
-// та специфікації доданого шаблона.   
-////
+#include <cassert>
 
+namespace Task1 {
+    //Написати функцію - шаблон, що переставляє перший максимальний та перший мінімальний елементи в масиві.
+    //Написати специфікацію функції - шаблон для типу char* .
 
- //using namespace std;
-    using std::cout;
-    using std::endl;
-    using std::ostream;
-    using std::istream;
+    template<size_t N>
+    void swap_min_max(char(&arr)[N]) {
+        // знаходимо мінімальний та максимальний елементи
+        auto min_it = std::min_element(arr, arr + N - 1);
+        auto max_it = std::max_element(arr, arr + N - 1);
 
-    class TLong {    //  long long 8 -byte
-        long long hi, lo;  // 16 byte 
-    public:
-        TLong() :hi(0), lo(0) {}
-        TLong(long long h, long long l) :hi(h), lo(l) {}
-        TLong& operator = (const TLong& s) {
-            hi = s.hi; lo = s.lo; return *this;
-        };
-        bool      operator > (const TLong& s) {
-            if (hi > s.hi) return true;
-            if (hi == s.hi && lo >= s.lo) return true;
-            return false;
+        // міняємо місцями мінімальний та максимальний елементи
+        std::swap(*min_it, *max_it);
+    }
+
+    template<size_t N, typename T>
+    void swap_min_max(T(&arr)[N]) {
+        // знаходимо мінімальний та максимальний елементи
+        auto min_it = std::min_element(arr, arr + N);
+        auto max_it = std::max_element(arr, arr + N);
+
+        // міняємо місцями мінімальний та максимальний елементи
+        std::swap(*min_it, *max_it);
+    }
+
+    int Task1main() 
+    {
+        std::cout << "========================================================================================================\n";
+        // тест 1: переставляємо місцями '1' та '9' у рядку
+        int str2[] = { 1,2,3,4,5,6,7,8,9 };
+
+        std::cout << "Array number one:";
+        for (int i = 0; i < sizeof(str2) / 4; i++) {
+            std::cout << " " << str2[i];
         }
-        friend ostream& operator<<(ostream& os,
-            TLong& s);
+        std::cout << "\n";
+        
+        swap_min_max(str2);
+        //assert(str2[0] == '9'); //Перевіряєм якщо перший елемент дорівнює 9
+        //assert(str2[8] == '1'); //Перевіряєм якщо останній елемент дорівнює 1
+
+        std::cout << "Modified array number one:";
+        for (int i = 0; i < sizeof(str2) / 4; i++) {
+            std::cout << " " << str2[i];
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+
+        // тест 2: переставляємо місцями 'a' та 'z' у рядку
+        char str1[] = "abcdefghijklmnopqrstuvwxyz";
+
+        std::cout << "Array number two:";
+        for (int i = 0; i < sizeof(str1); i++) {
+            std::cout << " " << str1[i];
+        }
+        std::cout << "\n";
+
+        swap_min_max(str1);
+        assert(str1[0] == 'z');
+        assert(str1[25] == 'a');
+
+        std::cout << "Modified array number two:";
+        for (int i = 0; i < sizeof(str1); i++) {
+            std::cout << " " << str1[i];
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+
+        std::cout << "All tests passed!\n";
+        std::cout << "\n";
+        std::cout << "========================================================================================================\n";
+
+        return 0;
+    }
+}
+namespace Task2 {
+    //Написати функцію-шаблон функцію впорядкування методом «Вставки».
+    //Написати специфікацію функції - шаблон для типу char* .
+    template<typename T, std::size_t N>
+    void insertion_sort(T(&arr)[N]) {
+        for (std::size_t i = 1; i < N; ++i) {
+            T key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+
+    template<std::size_t N>
+    void insertion_sort(char(&arr)[N]) {
+        for (std::size_t i = 1; i < N - 1; ++i) {
+            char key = arr[i];
+            std::size_t j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                --j;
+            }
+            arr[j + 1] = key;
+        }
+    }
+    int Task2main() {
+
+        // тест 1: сортування масиву int
+        int arr1[] = {3,2,1,4,5};
+
+        std::cout << "Array number one:";
+        for (int i = 0; i < 5; i++) {
+            std::cout << " " << arr1[i];
+        }
+        std::cout << "\n";
+
+        insertion_sort(arr1);
+        assert(arr1[0] == 1);
+        assert(arr1[1] == 2);
+        assert(arr1[2] == 3);
+        assert(arr1[3] == 4);
+        assert(arr1[4] == 5);
+
+        std::cout << "Modified array number one:";
+        for (int i = 0; i < 5; i++) {
+            std::cout << " " << arr1[i];
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+
+        // тест 2: сортування масиву double
+        double arr2[] = { 3.2, 1.1, 4.7, 2.8, 5.3 };
+
+        std::cout << "Array number two:";
+        for (int i = 0; i < 5; i++) {
+            std::cout << " " << arr2[i];
+        }
+        std::cout << "\n";
+
+        insertion_sort(arr2);
+        assert(arr2[0] == 1.1);
+        assert(arr2[1] == 2.8);
+        assert(arr2[2] == 3.2);
+        assert(arr2[3] == 4.7);
+        assert(arr2[4] == 5.3);
+
+        std::cout << "Modified array number two:";
+        for (int i = 0; i < 5; i++) {
+            std::cout << " " << arr2[i];
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+
+        // тест 3: сортування масиву char
+        char arr3[] = "hello";
+
+        std::cout << "Array number three:";
+        for (int i = 0; i < 5; i++) {
+            std::cout << " " << arr3[i];
+        }
+        std::cout << "\n";
+
+        insertion_sort(arr3);
+
+        std::cout << "Modified array number three:";
+        for (int i = 0; i < 6; i++) {
+            std::cout << " " << arr3[i];
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+
+        std::cout << "All tests passed!\n";
+            
+        assert(std::strcmp(arr3, "ehllo") == 0);
+
+        std::cout << "========================================================================================================\n";
+
+        return 0;
+    }
+}
+namespace Task3 {
+    template<typename T>
+    class Queue {
+    private:
+        struct Node {
+            T data; //самі дані
+            Node* next; //вказівник, що вказує на наступний елемент черги.
+            Node(const T& d) : data(d), next(nullptr) {}
+        };
+
+        Node* head; //це вказівник на перший елемент черги,  видаляти елементи з початку черги (вказівник head).
+        Node* tail; //це вказівник на останній елемент черги, додавати нові елементи до кінця черги (вказівник tail).
+
+    public:
+        Queue() : head(nullptr), tail(nullptr) {} //новий об'єкт черги та ініціалізує його два поля - нульовими вказівниками (nullptr).
+
+        //Деструктор
+        ~Queue() {
+            while (head) {
+                Node* tmp = head;
+                head = head->next;
+                delete tmp;
+            }
+        }
+        //повертає логічне значення true, якщо черга порожня, і логічне значення false, якщо черга не порожня, тобто містить хоча б один елемент.
+        bool empty() const {
+            return head == nullptr;
+        }
+        //повертає константну посилання на дані першого елемента черги, що знаходяться в полі data 
+        const T& front() const {
+            return head->data;
+        }
+        //додає новий елемент до кінця черги.
+        void push(const T& item) {
+            Node* newNode = new Node(item);
+            if (head == nullptr) {
+                head = tail = newNode;
+            }
+            else {
+                tail->next = newNode;
+                tail = newNode;
+            }
+        }
+        //видаляє перший елемент з черги.
+        void pop() {
+            if (head == nullptr) {
+                return;
+            }
+            Node* tmp = head;
+            head = head->next;
+            delete tmp;
+        }
     };
 
-    ostream& operator<<(ostream& os, TLong& s) {
-        os << "H " << s.hi << ":L " << s.lo << "  ";
-        return os;
-    }
-    //  функція - шаблон
-    template <typename T>
-    T max(T x, T y, T z, T u) {
-        T t = x > y ? x : y;
-        T r = z > u ? z : u;
-        return t > r ? t : r;
-    }
-    // специфікація функції - шаблон для типу char*
-    template<>  char* max(char* x, char* y, char* z, char* u)
-    {
-        char* t = strcmp(x, y) ? x : y;
-        char* r = strcmp(z, u) ? z : u;
-        return  strcmp(t, r) ? t : r;
-    }
+    int Task3main() {
+        Queue<int> queue;
+        queue.push(1);
+        queue.push(2);
+        queue.push(3);
 
+        std::cout << "Our array: ";
+        while (!queue.empty()) {
+            std::cout << queue.front() << " ";
+            queue.pop();
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+        std::cout << "Tests passed!\n";
+        std::cout << "========================================================================================================\n";
 
-    int fmain()
-    {
-        cout << "template\n";
-        int  a = 5, b = 4, k;
-        double r, t = 3.5, q = 3.05;
-        char c, s = 'a', n = 'f';
-        TLong l, i(100, 50), j(50, 100), e(75, 75), f(4, 200);
-        k = max(a, 13, b, 5);   cout << "k= " << k << endl;
-        r = max(t, q, 3.45, 9.32); cout << "r= " << r << endl;
-        c = max(s, 'r', n, 'z');  cout << "c= " << c << endl;
-        l = max(i, j, e, f);    cout << "l= " << l << endl;
-        char* s1 = (char*)"text", * s2 = (char*)"txt", * s3 = (char*)"pltext",
-            * s4 = (char*)"room", * s5;
-        s5 = max<char*>(s1, s2, s3, s4); cout << " s5 =  " << s5 << endl;
         return 0;
     }
 
-
 }
-namespace Stk {
-
-    using namespace std;
-    class TLong {    //  long long 8 -byte
-        long long hi, lo;  // 16 byte 
-    public:
-        TLong() :hi(0), lo(0) {}
-        TLong(long long h, long long l) :hi(h), lo(l) {}
-        TLong& operator = (const TLong& s) {
-            hi = s.hi; lo = s.lo; return *this;
+namespace Task4 {
+    template <typename T>
+    class DoublyLinkedList {
+    private:
+        struct Node {
+            T data; //тут зберігається обєкт
+            Node* prev; //попередній елемент
+            Node* next; //наступний елемент
+            Node(const T& d = T{}, Node* p = nullptr, Node* n = nullptr)    //конструктор який має обєкт, попередній елемент та наступний елемент
+                : data{ d }, prev{ p }, next{ n } {}
         };
-        bool      operator > (const TLong& s) {
-            if (hi > s.hi) return true;
-            if (hi == s.hi && lo >= s.lo) return true;
-            return false;
-        }
-        friend ostream& operator<<(ostream& os,
-            TLong& s);
-    };
-    ostream& operator<<(ostream& os, TLong& s) {
-        os << "H " << s.hi << ":L " << s.lo << "  ";
-        return os;
-    }
-    //  stack - шаблон
-
-
-    template <typename T = double, int SIZE = 100>   // <class T>
-    class stack_n
-    {
-        T m_stk[SIZE];   // Містить елементи стека.
-        int tos;        // Індекс вершини стека.
+        Node* head; //перший елемент
+        Node* tail; //останій елемент
+        int size;   //розмір
     public:
-        stack_n() { tos = 0; }    // Ініціалізує стек.
-        void push(T obj);        // Заштовхує об'єкт у стек.
-        T pop() {        // Виштовхує об'єкт зі стека.
-            if (tos == 0) { cout << "Стек порожній.\n"; return 0; }
-            tos--; return m_stk[tos];
-        }
-    };
-    // Функція що визначається за межами класу
-    template <typename T, int SIZE>
-    void stack_n<T, SIZE>::push(T obj) {
-        if (tos == SIZE) { cout << "Стек повний. \n"; return; }
-        m_stk[tos] = obj; tos++;
-    }
+        //Побудували клас ітератор, що дозволяє проходити список.
+        class Iterator {
+        public:
+            Iterator(Node* n = nullptr) : curr{ n } {} //це конструктор класу, який приймає вказівник на поточний елемент n і ініціалізує його відповідним чином.
+            T& operator*() { return curr->data; }      //це перевантажений оператор "розіменування", який повертає посилання на дані поточного елемента, що зберігаються в полі data.
+            Iterator& operator++() { curr = curr->next; return *this; } //ці перевантажені оператори "інкрементації" і "декрементації", які дозволяють переміщуватися по елементах списку. 
+            Iterator& operator--() { curr = curr->prev; return *this; } 
+            bool operator==(const Iterator& other) const { return curr == other.curr; } //ці перевантажені оператори порівняння, які дозволяють порівнювати два ітератори. Оператор == повертає true,
+            bool operator!=(const Iterator& other) const { return !(*this == other); }  //а оператор != повертає false 
+        //Коли ми переходимо від одного елемента списку до іншого, ми змінюємо значення змінної curr, щоб вказувати на поточний елемент.
+        private:
+            Node* curr;
+        };
 
-    typename char* pchar;
-    template <int SIZE>   // <class T>
-    class stack_n<char*, SIZE>
-    {
-        char* m_stk[SIZE];   // Містить елементи стека.
-        int tos;        // Індекс вершини стека.
-    public:
-        stack_n() { tos = 0; }    // Ініціалізує стек.
-        void push(char* obj);        // Заштовхує об'єкт у стек.
-        char* pop() {        // Виштовхує об'єкт зі стека.
-            if (tos == 0) { cout << "Стек порожній.\n"; return 0; }
-            tos--; return m_stk[tos];
+        DoublyLinkedList() : head{ nullptr }, tail{ nullptr }, size{ 0 } {} //конструктор по замовчуванню в якому всі значення зануляються
+        //Деструктор
+        ~DoublyLinkedList() {
+            Node* p;
+            while (head != nullptr) {
+                p = head;
+                head = head->next;
+                delete p;
+            }
+            tail = nullptr;
+            size = 0;
         }
-    };
-    // Функція що визначається за межами класу
-    template <int SIZE>
-    void stack_n<char*, SIZE>::push(char* obj) {
-        if (tos == SIZE) { cout << "Стек повний. \n"; return; }
-        m_stk[tos] = obj; tos++;
-    }
-    int smain()
-    {
-        int i;
-        setlocale(LC_CTYPE, "ukr");
-        std::cout << "Стек тести !\n";
-        stack_n<char, 10> s1, s2;
-        s1.push('a');  s2.push('x');  s1.push('b');
-        s2.push('y');  s1.push('c');  s2.push('z');
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо s1: " << s1.pop() << "\n";
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо s2: " << s2.pop() << "\n";
-        // Демонстрація стека дійсних чисел
-        stack_n<double> ds1, ds2; // Створюємо дві стеки дійсних чисел.
-        ds1.push(1.1);  ds2.push(2.2); ds1.push(3.3);
-        ds2.push(4.4);  ds1.push(5.5); ds2.push(6.6);
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо ds1: " << ds1.pop() << "\n";
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо ds2: " << ds2.pop() << "\n";
-        stack_n <TLong, 10> ln1, ln2;
-        ln1.push(TLong(5, 4));   ln1.push(TLong(50000, 4));   ln1.push(TLong(5, 400000));
-        ln2.push(TLong(3673865, 643287));   ln2.push(TLong(56748, 64374));   ln2.push(TLong(36287, 40530));
-        char* st1 = (char*)"text", * st2 = (char*)"txt", * st3 = (char*)"pltext",
-            * st4 = (char*)"room", * st5 = (char*)"text2";
+        //Гетер для розміру
+        int getSize() const { return size; }
+        //Порівняння якщо список не пустий, та повертає значення True або False 
+        bool isEmpty() const { return size == 0; }
+        //Заповнення списку спочатку
+        void pushFront(const T& val) {
+            head = new Node(val, nullptr, head);
+            if (tail == nullptr) {
+                tail = head;
+            }
+            else {
+                head->next->prev = head;
+            }
+            size++;
+        }
+        //Заповнення списку з кінця 
+        void pushBack(const T& val) {
+            tail = new Node(val, tail, nullptr);
+            if (head == nullptr) {
+                head = tail;
+            }
+            else {
+                tail->prev->next = tail;
+            }
+            size++;
+        }
+        //Видалення списку спочатку
+        void popFront() {
+            if (isEmpty()) {
+                throw std::out_of_range("List is empty");
+            }
+            Node* p = head;
+            head = head->next;
+            if (head == nullptr) {
+                tail = nullptr;
+            }
+            else {
+                head->prev = nullptr;
+            }
+            delete p;
+            size--;
+        }
+        //Видалення списку з кінця
+        void popBack() {
+            if (isEmpty()) {
+                throw std::out_of_range("List is empty");
+            }
+            Node* p = tail;
+            tail = tail->prev;
+            if (tail == nullptr) {
+                head = nullptr;
+            }
+            else {
+                tail->next = nullptr;
+            }
+            delete p;
+            size--;
+        }
 
-        stack_n <char*, 5> ss;
-        ss.push(st3); ss.push(st4); ss.push(st5); ss.push(st1);
-        ss.push(st2);
-        for (i = 0; i < 5; i++) cout << "Виштовхуємо ss: " << ss.pop() << "\n";
+        Iterator begin() const { return Iterator(head); }
+        Iterator end() const { return Iterator(nullptr); }
+    };
+    int Task4main() {
+        DoublyLinkedList<int> list;
+        list.pushBack(1);
+        list.pushBack(2);
+        list.pushBack(3);
+        list.pushBack(4);
+
+        std::cout << "Our array: ";
+        for (DoublyLinkedList<int>::Iterator it = list.begin(); it != list.end(); ++it) {
+            std::cout << *it << " ";
+        }
+        std::cout << "\n";
+        std::cout << "\n";
+        std::cout << "Tests passed!\n";
+        std::cout << "========================================================================================================\n";
+
         return 0;
     }
 }
 void example()
 {
-    Fun::fmain();
-    Stk::smain();
+    int task;
+    do {
+        std::cout << "Enter a task number (1-4), or 0 to exit: ";
+        std::cin >> task;
+
+        switch (task) {
+        case 1:
+            Task1::Task1main();
+            break;
+        case 2:
+            Task2::Task2main();
+            break;
+        case 3:
+            Task3::Task3main();
+            break;
+        case 4:
+            Task4::Task4main();
+            break;
+        case 0:
+            std::cout << "Exiting program..." << "\n";
+            break;
+        default:
+            std::cout << "Invalid task number. Please try again." << "\n";
+            break;
+        }
+    } while (task != 0);
 }
